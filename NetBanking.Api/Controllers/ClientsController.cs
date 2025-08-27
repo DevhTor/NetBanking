@@ -28,17 +28,5 @@ namespace NetBanking.Api.Controllers
             return Ok(client);
         }
 
-        [HttpGet("{clientId}/accounts")]
-        public async Task<ActionResult<IEnumerable<Account>>> GetClientAccounts(int clientId)
-        {
-            var accounts = await _clientService.GetClientAccountsAsync(clientId);
-
-            if (accounts == null || !accounts.Any())
-            {
-                return NotFound();
-            }
-
-            return Ok(accounts);
-        }
     }
 }

@@ -1,9 +1,8 @@
-﻿using NetBanking.Api.Models;
+﻿// ITransactionService.cs
+using NetBanking.Api.Models;
 
-namespace NetBanking.Api.Services
+public interface ITransactionService
 {
-    public interface ITransactionService
-    {
-        Task<IEnumerable<Transaction>> GetTransactionsByAccountIdAsync(int accountId);
-    }
+    Task<IEnumerable<Transaction>> GetTransactionsByAccountIdAsync(int accountId);
+    Task CreateTransactionAsync(Transaction transaction);
 }

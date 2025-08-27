@@ -4,7 +4,7 @@ using NetBanking.Api.Models;
 
 namespace NetBanking.Api.Repositories
 {
-    public class TransactionRepository : IRepository<Transaction>
+    public class TransactionRepository : IRepository<Transaction>, ITransactionRepository
     {
         private readonly NetbankingDbContext _context;
 
@@ -39,6 +39,14 @@ namespace NetBanking.Api.Repositories
         {
             _context.Transactions.Remove(transaction);
             await _context.SaveChangesAsync();
+        }
+
+        // Implementación del método específico
+        public async Task<IEnumerable<Transaction>> GetTransactionsByAccountIdAsync(int accountId)
+        {
+            return await _context.Transactions
+                                 .Where(t => t.SourceAccountId == accountId || t.DestinationAccountId == accountId)
+                                 .ToListAsync();
         }
     }
 }

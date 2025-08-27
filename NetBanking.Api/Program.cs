@@ -28,6 +28,10 @@ namespace NetBanking.Api
             builder.Services.AddScoped<IRepository<Account>, AccountRepository>();
             builder.Services.AddScoped<IRepository<Transaction>, TransactionRepository>();
 
+            // Add the specific repository registrations needed by the services
+            builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+            builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+
             // Add services for controllers
             builder.Services.AddScoped<IAccountService, AccountService>();
             builder.Services.AddScoped<IClientService, ClientService>();

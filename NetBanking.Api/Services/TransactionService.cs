@@ -1,21 +1,23 @@
 ﻿using NetBanking.Api.Models;
-using NetBanking.Api.Repositories;
 
-namespace NetBanking.Api.Services
+public class TransactionService : ITransactionService
 {
-    public class TransactionService : ITransactionService
+    private readonly ITransactionRepository _transactionRepository;
+
+    public TransactionService(ITransactionRepository transactionRepository)
     {
-        private readonly IRepository<Transaction> _transactionRepository;
+        _transactionRepository = transactionRepository;
+    }
 
-        public TransactionService(IRepository<Transaction> transactionRepository)
-        {
-            _transactionRepository = transactionRepository;
-        }
+    public async Task<IEnumerable<Transaction>> GetTransactionsByAccountIdAsync(int accountId)
+    {
+        // Delega la búsqueda al repositorio, que lo hará de forma eficiente.
+        return await _transactionRepository.GetTransactionsByAccountIdAsync(accountId);
+    }
 
-        public async Task<IEnumerable<Transaction>> GetTransactionsByAccountIdAsync(int accountId)
-        {
-            var allTransactions = await _transactionRepository.GetAllAsync();
-            return allTransactions.Where(t => t.SourceAccountId == accountId || t.DestinationAccountId == accountId);
-        }
+    public async Task CreateTransactionAsync(Transaction transaction)
+    {
+        // Delega la creación de la transacción al repositorio.
+        await _transactionRepository.AddAsync(transaction);
     }
 }
