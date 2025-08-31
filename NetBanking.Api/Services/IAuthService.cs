@@ -1,7 +1,10 @@
-﻿namespace NetBanking.Api.Services
+﻿using NetBanking.Api.Models;
+
+namespace NetBanking.Api.Services
 {
     public interface IAuthService
     {
-        Task<string> AuthenticateAsync(string username, string password);
+        Task<Client> AuthenticateAsync(string username, string password);
+        string GenerateJwtToken(Client client);
     }
 }

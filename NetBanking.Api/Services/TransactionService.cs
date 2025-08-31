@@ -1,6 +1,8 @@
-﻿using NetBanking.Api.Models;
+﻿// TransactionService.cs
+
+using NetBanking.Api.Models;
 using NetBanking.Api.Repositories;
-using NetBanking.Api.Requests; // Importa el namespace de TransferRequest
+using NetBanking.Api.Requests;
 
 public class TransactionService : ITransactionService
 {
@@ -25,9 +27,11 @@ public class TransactionService : ITransactionService
 
     public async Task TransferFundsAsync(TransferRequest request)
     {
-        // Obtener las cuentas de origen y destino
+        // Obtener la cuenta de origen
         var sourceAccount = await _accountRepository.GetByIdAsync(request.SourceAccountId);
-        var destinationAccount = await _accountRepository.GetByIdAsync(request.DestinationAccountId);
+
+        // MODIFICACIÓN: Buscar la cuenta de destino por el NÚMERO DE CUENTA
+        var destinationAccount = (await _accountRepository.GetAllAsync()).FirstOrDefault(a => a.AccountNumber == request.DestinationAccountNumber);
 
         // Validar las cuentas y el saldo
         if (sourceAccount == null || destinationAccount == null)
@@ -55,7 +59,7 @@ public class TransactionService : ITransactionService
             TransactionDate = DateTime.UtcNow,
             Description = request.Description,
             SourceAccountId = request.SourceAccountId,
-            DestinationAccountId = request.DestinationAccountId
+            DestinationAccountId = destinationAccount.Id // Usa el ID de la cuenta de destino encontrada
         };
 
         var creditTransaction = new Transaction
@@ -64,7 +68,7 @@ public class TransactionService : ITransactionService
             TransactionDate = DateTime.UtcNow,
             Description = request.Description,
             SourceAccountId = request.SourceAccountId,
-            DestinationAccountId = request.DestinationAccountId
+            DestinationAccountId = destinationAccount.Id
         };
 
         await _transactionRepository.AddAsync(debitTransaction);

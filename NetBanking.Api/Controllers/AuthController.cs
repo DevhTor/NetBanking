@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NetBanking.Api.Requests;
 using NetBanking.Api.Services;
-using System.IdentityModel.Tokens.Jwt;
 
 namespace NetBanking.Api.Controllers
 {
@@ -19,23 +18,18 @@ namespace NetBanking.Api.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            var token = await _authService.AuthenticateAsync(request.Username, request.Password);
+            var client = await _authService.AuthenticateAsync(request.Username, request.Password);
 
-            if (token == null)
+            if (client == null)
             {
                 return Unauthorized(new { message = "Credenciales inválidas." });
             }
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var jwtSecurityToken = tokenHandler.ReadToken(token) as JwtSecurityToken;
-            var clientIdClaim = jwtSecurityToken?.Claims.FirstOrDefault(c => c.Type == "nameid");
+            var token = _authService.GenerateJwtToken(client);
+            var clientId = client.Id;
+            var clientName = client.Name;
 
-            if (clientIdClaim == null)
-            {
-                return Unauthorized(new { message = "Error al obtener ID de cliente del token." });
-            }
-
-            return Ok(new { token, clientId = int.Parse(clientIdClaim.Value) });
+            return Ok(new LoginResponse { Token = token, ClientId = clientId, ClientName = clientName });
         }
     }
 }

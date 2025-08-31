@@ -18,15 +18,20 @@ namespace NetBanking.Api.Services
             _configuration = configuration;
         }
 
-        public async Task<string> AuthenticateAsync(string username, string password)
+        public async Task<Client> AuthenticateAsync(string username, string password)
         {
             var client = (await _clientRepository.GetAllAsync()).FirstOrDefault(c => c.Email == username);
 
-            if (client == null || !BCrypt.Net.BCrypt.Verify(password, client.PasswordHash)) // <-- Verificamos el hash aquí
+            if (client == null || !BCrypt.Net.BCrypt.Verify(password, client.PasswordHash))
             {
-                return null; // Autenticación fallida
+                return null;
             }
 
+            return client;
+        }
+
+        public string GenerateJwtToken(Client client)
+        {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
             var tokenDescriptor = new SecurityTokenDescriptor
